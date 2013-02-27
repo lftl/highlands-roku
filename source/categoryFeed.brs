@@ -12,8 +12,8 @@ Function InitCategoryFeedConnection() As Object
 
     conn = CreateObject("roAssociativeArray")
 
-    conn.UrlPrefix   = "http://rokudev.roku.com/rokudev/examples/videoplayer/xml"
-    conn.UrlCategoryFeed = conn.UrlPrefix + "/categories.xml"
+	conn.UrlPrefix   = "http://api.churchofthehighlands.com"
+    conn.UrlCategoryFeed = conn.UrlPrefix + "/media/series"
 
     conn.Timer = CreateObject("roTimespan")
 
@@ -70,20 +70,6 @@ Function load_category_feed(conn As Object) As Dynamic
     Dbg("Parse Took: ", m.Timer)
 
     m.Timer.Mark()
-    if xml.category = invalid then
-        print "no categories tag"
-        return invalid
-    endif
-
-    if islist(xml.category) = false then
-        print "invalid feed body"
-        return invalid
-    endif
-
-    if xml.category[0].GetName() <> "category" then
-        print "no initial category tag"
-        return invalid
-    endif
 
     topNode = MakeEmptyCatNode()
     topNode.Title = "root"
@@ -128,15 +114,15 @@ Function ParseCategoryNode(xml As Object) As dynamic
 
     'parse the curent node to determine the type. everything except
     'special categories are considered normal, others have unique types 
-    if xml.GetName() = "category" then
-        print "category: " + xml@title + " | " + xml@description
+    if xml.GetName() = "Series" then
+        print "category: " + xml@Title
         o.Type = "normal"
-        o.Title = xml@title
-        o.Description = xml@Description
+        o.Title = xml@Title
+        o.Description = ""
         o.ShortDescriptionLine1 = xml@Title
-        o.ShortDescriptionLine2 = xml@Description
-        o.SDPosterURL = xml@sd_img
-        o.HDPosterURL = xml@hd_img
+        o.ShortDescriptionLine2 = ""
+        o.SDPosterURL = xml@BaseImageURL + "40x40.jpg"
+        o.HDPosterURL = xml@BaseImageURL + "620x300.jpg"
     elseif xml.GetName() = "categoryLeaf" then
         o.Type = "normal"
     elseif xml.GetName() = "specialCategory" then
